@@ -4,7 +4,7 @@ import GameGrid from "./components/game-grid";
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { v4 } from "uuid";
-import { createPieces } from "./model";
+import { createPieces } from "./models/model";
 
 export default function Home() {
   const [socket, setSocket] = useState(null);
