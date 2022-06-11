@@ -1,59 +1,13 @@
 import { useState, useEffect } from "react";
 
-const symbols = "!@#$%^&*()~{}[]+><|?";
-
-const randomInt = () => {
-  return Math.ceil(Math.random() * 100) + 5;
-};
-
-const randomSym = () => {
-  const index = Math.floor(Math.random() * symbols.length);
-  return symbols[index];
-};
-
-const getSymbolArray = (size) => {
-  const list = new Set();
-
-  while (list.size !== size) {
-    list.add(randomSym());
-  }
-
-  return [...list].map((value) => ({ value, state: "HIDDEN" }));
-};
-const shuffle = (array) => {
-  let currentIndex = array.length;
-  let randomIndex;
-
-  while (currentIndex) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
-    ];
-  }
-  return array;
-};
-
-const createPieces = (size, type) => {
-  const matches =
-    type === "NUM"
-      ? new Array(size).fill(0).map(() => ({
-          value: randomInt(),
-          state: "HIDDEN",
-        }))
-      : getSymbolArray(size);
-  console.log({ matches });
-  const pieces = [...matches, ...matches];
-  return shuffle(pieces);
-};
-
-const Piece = ({ piece, type, index, onSelect }) => {
+const Piece = ({ piece, type, index, canPlay, onSelect }) => {
   const visible = piece.state !== "HIDDEN";
 
   const bgColor = visible
     ? "border-indigo-900 border-4 bg-yellow-100"
-    : "bg-green-300";
+    : canPlay
+    ? "bg-green-300"
+    : "bg-gray-500";
 
   const fontSize = type === "NUM" ? "text-lg" : "text-2xl";
   const handleClick = () => {
@@ -62,7 +16,7 @@ const Piece = ({ piece, type, index, onSelect }) => {
 
   return (
     <button
-      disabled={piece.state === "OPEN"}
+      disabled={piece.state === "OPEN" || !canPlay}
       onClick={handleClick}
       className={`rounded-full w-12 h-12 md:w-16 md:h-16 p-4 m-1 font-bold ${bgColor} ${fontSize}`}
     >
@@ -71,51 +25,66 @@ const Piece = ({ piece, type, index, onSelect }) => {
   );
 };
 
-const setOpen = (array, index) => {
-  array[index] = { ...array[index], state: "OPEN" };
+const setPieceState = (array, indices, state) => {
+  indices.forEach((index) => {
+    array[index] = { ...array[index], state };
+  });
   return array;
 };
 
-const setHidden = (array, index) => {
-  array[index] = { ...array[index], state: "HIDDEN" };
-  return array;
-};
-
-export const GameGrid = ({ size, type }) => {
-  console.log(size);
-  const [pieces, setPieces] = useState([]);
+export const GameGrid = ({ canPlay, pieces, onSwitchTurn, onToggle }) => {
+  const [gamePieces, setPieces] = useState(pieces.slice());
   const [selected, setSelected] = useState(null);
 
-  const onSelect = ({ piece, index }) => {
+  const onSelect = ({ piece, index, switchTurn }) => {
     const newPieces = pieces.slice(0);
     if (!selected) {
       setSelected({ piece, index });
-      setPieces(setOpen(newPieces, index));
+      const updated = setPieceState(newPieces, [index], "OPEN");
+      onToggle(updated);
+      setPieces(updated);
     } else if (selected.piece.value === piece.value) {
-      setPieces(setOpen(setOpen(newPieces, index), selected.piece.index));
+      const updated = setPieceState(newPieces, [index, selected.index], "OPEN");
+      setPieces(updated);
+      onSwitchTurn(updated);
       setSelected(null);
     } else {
-      setPieces(setOpen(newPieces, index));
+      const updated = setPieceState(newPieces, [index], "OPEN");
+      setPieces(updated);
+      onToggle(updated);
       setTimeout(() => {
         const resetPieces = pieces.slice(0);
-        setPieces(setHidden(setHidden(resetPieces, index), selected.index));
+        const reset = setPieceState(
+          resetPieces,
+          [index, selected.index],
+          "HIDDEN"
+        );
+        setPieces(reset);
+        onSwitchTurn(reset);
         setSelected(null);
       }, 500);
     }
   };
+
   useEffect(() => {
-    setPieces(createPieces(size, type));
-  }, [size, type]);
+    setPieces(pieces);
+  }, [pieces]);
 
   return (
     <div
       className={`grid ${
-        size === 18 ? "grid-cols-6" : "grid-cols-4"
+        gamePieces.length === 6 ? "grid-cols-6" : "grid-cols-4"
       } justify-items-center justify-center content-center mt-6 w-full lg:w-1/2`}
     >
-      {pieces.map((piece, index) => {
+      {gamePieces.map((piece, index) => {
         return (
-          <Piece key={index} onSelect={onSelect} piece={piece} index={index} />
+          <Piece
+            key={index}
+            onSelect={onSelect}
+            piece={piece}
+            index={index}
+            canPlay={canPlay}
+          />
         );
       })}
     </div>

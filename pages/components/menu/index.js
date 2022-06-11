@@ -1,4 +1,11 @@
-export const Menu = ({ type, size, onSelectSize, onSelectType }) => {
+export const Menu = ({
+  type,
+  size,
+  onSelectSize,
+  onSelectType,
+  onNewGame,
+  onJoinGame,
+}) => {
   const onGridSizeChange = (ev) => {
     onSelectSize(ev.target.value);
   };
@@ -6,13 +13,27 @@ export const Menu = ({ type, size, onSelectSize, onSelectType }) => {
   const onGridTypeChange = (ev) => {
     onSelectType(ev.target.value);
   };
+
   return (
     <header className="p-3">
       <div className="flex justify-center items-center">
-        <h1 className="text-2xl w-4/12">memory</h1>
+        <h1 className="text-2xl w-4/12">
+          <a href="/">memory</a>
+        </h1>
         <div className="flex justify-end w-8/12">
-          <button className="p-2 md:p-3 mx-2 bg-yellow-500 text-white bold rounded-lg">
+          <button
+            onClick={onNewGame}
+            className="p-2 md:p-3 mx-2 bg-yellow-500 text-white bold rounded-lg"
+          >
             New Game
+          </button>
+
+          <button
+            className={`p-2 md:p-3 mx-2 bg-gray-300
+             text-white bold rounded-lg`}
+            onClick={onJoinGame}
+          >
+            Join Game
           </button>
         </div>
       </div>
