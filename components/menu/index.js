@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export const Menu = ({
   type,
   size,
@@ -19,9 +17,7 @@ export const Menu = ({
   return (
     <header className="p-3">
       <div className="flex justify-center items-center">
-        <h1 className="text-2xl w-4/12">
-          <Link to="/">memory</Link>
-        </h1>
+        <h1 className="text-2xl w-4/12">memory</h1>
         <div className="flex justify-end w-8/12">
           <button
             onClick={onNewGame}

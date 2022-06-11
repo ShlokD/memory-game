@@ -1,6 +1,6 @@
 import Head from "next/head";
-import Menu from "./components/menu";
-import GameGrid from "./components/game-grid";
+import Menu from "../components/menu";
+import GameGrid from "../components/game-grid";
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { v4 } from "uuid";
