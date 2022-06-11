@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const Menu = ({
   type,
   size,
@@ -18,7 +20,7 @@ export const Menu = ({
     <header className="p-3">
       <div className="flex justify-center items-center">
         <h1 className="text-2xl w-4/12">
-          <a href="/">memory</a>
+          <Link to="/">memory</Link>
         </h1>
         <div className="flex justify-end w-8/12">
           <button
